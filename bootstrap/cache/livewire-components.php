@@ -1,0 +1,12 @@
+<?php return array (
+  'admin.buy-slot' => 'App\\Http\\Livewire\\Admin\\BuySlot',
+  'admin.manage-users' => 'App\\Http\\Livewire\\Admin\\ManageUsers',
+  'admin.software-module' => 'App\\Http\\Livewire\\Admin\\SoftwareModule',
+  'admin.theme-display' => 'App\\Http\\Livewire\\Admin\\ThemeDisplay',
+  'admin.trading-payment' => 'App\\Http\\Livewire\\Admin\\TradingPayment',
+  'user.crypto-payment' => 'App\\Http\\Livewire\\User\\CryptoPayment',
+  'user.crypto-withdaw' => 'App\\Http\\Livewire\\User\\CryptoWithdaw',
+  'user.investment-plan' => 'App\\Http\\Livewire\\User\\InvestmentPlan',
+  'user.subscribe-to-signal' => 'App\\Http\\Livewire\\User\\SubscribeToSignal',
+  'user.system-courses' => 'App\\Http\\Livewire\\User\\SystemCourses',
+);

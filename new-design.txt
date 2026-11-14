@@ -1,0 +1,630 @@
+Design Style
+
+Theme
+
+Primary: Rich Banking Red (#D6001C)
+Secondary: Pure White (#FFFFFF)
+Accent: Soft Black (#1A1A1A)
+Glassmorphism Cards
+Frosted Blur
+Soft Shadows
+Floating Elements
+Large Rounded Corners (20-32px)
+Premium Gradients
+Smooth Micro Interactions
+
+The entire website should have breathing space.
+
+No clutter.
+
+Every section should have movement.
+
+
+Homepage Flow
+
+1. Fullscreen Hero
+
+The moment the page opens...
+
+Instead of a static hero...
+
+Everything slowly comes alive.
+
+Background:
+
+Animated white gradient waves.
+
+Soft glowing particles moving.
+
+Floating abstract banking lines.
+
+Very subtle red light effects.
+
+
+Left Side
+
+Huge headline
+
+Banking Made
+Easily.
+Fast.
+Secure.
+
+The words rotate one after another.
+
+Beautiful
+
+↓
+
+Fast
+
+↓
+
+Smarter
+
+↓
+
+Secure
+
+↓
+
+Borderless
+
+Smooth text transition.
+
+Small paragraph underneath
+
+Explaining instant transfers, digital cards, investments and savings.
+
+Buttons
+
+Open Account
+
+Login 
+
+Hover effects:
+
+Buttons expand.
+
+Arrow slides.
+
+Glow appears.
+
+------------------
+
+Right Side
+
+Instead of one phone...
+
+Have
+
+Three floating phones.
+
+Phone 1
+
+Transaction history
+
+Phone 2
+
+Debit Card
+
+Phone 3
+
+Analytics
+
+The phones slowly float independently.
+
+Tiny rotations.
+
+Glass reflections.
+
+Every few seconds
+
+Money transfers animate.
+
+Balance numbers increase.
+
+Notifications appear.
+
+Cards flip.
+
+Tiny confetti appears after successful transfer.
+
+Scrolling down...
+
+Phones slowly separate.
+
+One moves left.
+
+One moves right.
+
+One scales.
+
+Feels cinematic.
+
+Interactive Mouse Movement
+
+Desktop:
+
+Move mouse.
+
+Phones slightly follow.
+
+Cards rotate.
+
+Glows move.
+
+Particles react.
+
+Mobile:
+
+Gyroscope movement.
+
+Very subtle.
+
+Feels premium.
+
+Trusted By Section
+
+Instead of boring logos...
+
+Create an infinite scrolling marquee.
+
+Partner logos.
+
+Payment providers.
+
+Visa
+
+Mastercard
+
+Apple Pay
+
+Google Pay
+
+Verve
+
+Flutterwave
+
+Paystack
+
+NIBSS
+
+Each logo slightly enlarges on hover.
+
+Why Customers Love Us
+
+Instead of cards...
+
+Create a horizontal storytelling section.
+
+Scrolling moves horizontally.
+
+Every panel fills the screen.
+
+Panel 1
+
+Instant Transfers
+
+Large animation
+
+Money flies from one phone to another.
+
+Panel 2
+
+Virtual Cards
+
+Animated card rotates.
+
+Glass reflections.
+
+Panel 3
+
+Investments
+
+Charts animate upward.
+
+Coins stack themselves.
+
+
+Panel 4
+
+Loans
+
+Application fills itself.
+
+Approved badge appears.
+
+Every panel has animated backgrounds.
+
+Banking Experience Section
+
+This should feel like Apple.
+
+Huge typography.
+
+White background.
+
+Minimal.
+
+Massive screenshots.
+
+Scroll.
+
+Image changes.
+
+Text changes.
+
+Phone rotates.
+
+Features animate.
+
+One feature at a time.
+
+Smart Statistics Section
+
+Red gradient background.
+
+Animated counters.
+
+₦12B+
+
+Transactions
+
+95%
+
+Customer Satisfaction
+
+5M+
+
+Users
+
+0.8 sec
+
+Average Transfer
+
+Numbers count upward.
+
+Charts animate.
+
+Background waves move.
+
+Live Banking Dashboard
+
+A full banking dashboard appears.
+
+As you scroll
+
+Different widgets animate.
+
+Recent Transactions
+
+Pie Charts
+
+Balance
+
+Credit Score
+
+Savings Goals
+
+Budgets
+
+Investments
+
+Cards rearrange themselves.
+
+Feels alive.
+
+Card Showcase
+
+Beautiful section.
+
+Floating debit cards.
+
+Black Card
+
+Ruby Card
+
+White Card
+
+Premium Card
+
+Cards rotate in 3D.
+
+Glow.
+
+Reflection follows mouse.
+
+Hover
+
+Card lifts.
+
+Rotates.
+
+Shadow grows.
+
+AI Financial Assistant
+
+Large AI chatbot bubble.
+
+Animated.
+
+Conversation appears automatically.
+
+User:
+
+Can I save ₦50,000 monthly?
+
+AI:
+
+Absolutely.
+
+Projected savings:
+
+₦600,000
+
+Suggestions appear.
+
+Charts update.
+
+Feels intelligent.
+
+Security Section
+
+Dark background.
+
+White typography.
+
+Red glow.
+
+Huge shield animation.
+
+Lock pieces assemble.
+
+Fingerprint scans.
+
+Face ID animation.
+
+Encryption particles.
+
+Features Grid
+
+Instead of boring icons...
+
+Each card contains
+
+Mini animation.
+
+Examples
+
+Transfer
+
+Money moves.
+
+Savings
+
+Piggy bank fills.
+
+Loans
+
+Paper flies.
+
+Cards
+
+Debit card flips.
+
+Rewards
+
+Coins burst.
+
+Insurance
+
+Shield forms.
+
+Crypto
+
+Animated blockchain.
+
+QR Payments
+
+QR scans.
+
+Hover
+
+Card expands.
+
+Background changes.
+
+Icon animates.
+
+Customer Stories
+
+Instead of testimonials
+
+Create floating speech bubbles.
+
+People images.
+
+Ratings.
+
+Success stories.
+
+Everything floats.
+
+Hover
+
+Bubble enlarges.
+
+Video popup available.
+
+Mobile Banking Section
+
+Huge phone mockup.
+
+Phone follows scroll.
+
+Every scroll
+
+Different app screen.
+
+Dashboard
+
+↓
+
+Transfer
+
+↓
+
+Cards
+
+↓
+
+Savings
+
+↓
+
+Investments
+
+↓
+
+Notifications
+
+Smooth morphing animation.
+
+Final CTA
+
+Massive section.
+
+White background.
+
+Large typography.
+
+Ready to Bank Smarter?
+
+Open Your Account in Minutes.
+
+Animated background lines.
+
+Button pulse.
+
+Footer
+
+Instead of static footer
+
+Animated wave.
+
+Particles.
+
+Social icons glow.
+
+Hover animations.
+
+Crazy Scroll Animations
+
+Every section should have:
+
+Fade Up
+
+Scale
+
+Blur In
+
+Text Reveal
+
+Character Reveal
+
+Mask Reveal
+
+Parallax
+
+Image Zoom
+
+Glass Reflection
+
+Depth Movement
+
+Magnetic Buttons
+
+Elastic Hover
+
+Smooth Momentum Scrolling
+
+Sticky Storytelling
+
+Horizontal Scroll Sections
+
+Split Screen Animations
+
+3D Rotations
+
+Floating Objects
+
+Infinite Marquee
+
+Liquid Background Motion
+
+Morphing Shapes
+
+Gradient Shifts
+
+Glowing Borders
+
+Cursor Effects (desktop)
+
+Gyroscope Motion (mobile)
+
+Animated SVG Line Drawings
+
+Card Stack Transitions
+
+Progress-Based Scroll Animations
+
+Micro Interactions
+
+Every click should feel satisfying.
+
+Buttons compress slightly before expanding.
+
+Cards lift with soft shadows.
+
+Icons animate when hovered.
+
+Input fields glow elegantly on focus.
+
+Success actions trigger a subtle ripple.
+
+Counters animate only when entering the viewport.
+
+Every page transition fades and slides smoothly.
+
+Mobile Experience
+
+The mobile version should not be a simplified copy of the desktop experience—it should feel intentionally designed.
+
+Full-screen immersive hero with stacked animated phone mockups.
+Thumb-friendly floating navigation with smooth hide/show behavior while scrolling.
+Swipeable feature cards with snap scrolling.
+Sticky bottom "Open Account" CTA that gently appears after the hero.
+Optimized parallax and motion effects for smooth 60fps performance.
+Touch gestures trigger subtle card tilts, ripples, and haptic-style visual feedback.
+Lightweight animations to preserve battery life while maintaining a premium feel.
+
+
+Overall User Journey
+
+The experience should unfold like a story:
+
+A powerful first impression that immediately communicates innovation and trust.
+Interactive discovery where users naturally explore features through motion rather than dense text.
+Proof and confidence using live dashboards, statistics, customer stories, and security demonstrations.
+Emotional connection with beautiful visuals, delightful micro-interactions, and seamless transitions.
+A compelling finish with a strong call-to-action that makes opening an account feel like the obvious next step.
+
+The end result should feel less like a conventional banking website and more like a premium fintech experience—combining the visual polish of Apple, the smooth interactions of Linear, the modern feel of Revolut, and the trustworthiness expected from a world-class financial institution.
+
+
+
+
+
+
+

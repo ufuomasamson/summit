@@ -1,0 +1,79 @@
+SUMMIT BANK — cPanel Upload Guide
+=================================
+
+Build prepared locally on: Jul 17, 2026
+
+WHAT WAS RUN LOCALLY
+--------------------
+1. composer install --no-dev --optimize-autoloader
+2. npm install
+3. php artisan optimize:clear (all caches cleared)
+4. php artisan storage:link
+5. php artisan package:discover
+
+NOTE: npm run production failed (metaapi.cloud-sdk / webpack polyfills).
+This does NOT block cPanel upload — the site uses ready CSS/JS in /css, /js,
+/dash, /dash2, and /public. You do not need the Mix build for this script.
+
+
+UPLOAD STEPS (cPanel)
+---------------------
+1. Create a MySQL database + user in cPanel → MySQL Databases
+2. Import your database dump (SQL) into that database
+3. Upload the zip and extract into:
+   - public_html/          (main domain)
+   - OR public_html/folder (subfolder)
+   - OR subdomain document root
+4. Edit .env on the server:
+
+   APP_NAME="Summit Bank"
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://yourdomain.com
+
+   DB_DATABASE=your_cpanel_db_name
+   DB_USERNAME=your_cpanel_db_user
+   DB_PASSWORD=your_cpanel_db_password
+   DB_HOST=localhost
+
+5. Set folder permissions (cPanel File Manager or SSH):
+   storage/                 → 775 (recursive)
+   bootstrap/cache/         → 775 (recursive)
+
+6. If SSH is available, run on the server:
+   php artisan storage:link
+   php artisan optimize:clear
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+
+7. Cron job (cPanel → Cron Jobs):
+   curl https://yourdomain.com/cron
+   Schedule every minute or every 5 minutes.
+
+
+ADMIN LOGIN
+-----------
+URL:  https://yourdomain.com/adminlogin/panel
+Email: admin@admin.com
+Password: admin123
+Passphrase: 4663
+(Change these immediately after go-live.)
+
+
+DO NOT UPLOAD
+-------------
+- node_modules/
+- .git/
+- composer.phar
+- storage/logs/*.log (empty logs folder is fine)
+- Local-only temp check scripts
+
+
+IMPORTANT
+---------
+- Keep vendor/ in the upload (Composer already installed production packages).
+- After changing .env on the server, clear caches again.
+- Point the domain document root to the folder that contains index.php
+  (this project uses root index.php, not only /public).
+- Educational script — configure SMTP, SSL, and security before real use.
