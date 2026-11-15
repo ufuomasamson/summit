@@ -43,26 +43,74 @@ require_paths() {
   command -v rsync >/dev/null 2>&1 || fail "rsync is required but was not found on PATH"
 }
 
+# Create Laravel runtime directories if missing. Never deletes existing content,
+# never chmods 777, never changes ownership.
+ensure_storage_directories() {
+  log "Ensuring required Laravel directories exist under ${DEST}"
+  cd "${DEST}"
+
+  local dirs=(
+    storage
+    storage/app
+    storage/app/public
+    storage/app/public/photos
+    storage/app/public/uploads
+    storage/app/livewire-tmp
+    storage/app/temp
+    storage/framework
+    storage/framework/cache
+    storage/framework/cache/data
+    storage/framework/sessions
+    storage/framework/testing
+    storage/framework/views
+    storage/logs
+    bootstrap/cache
+  )
+
+  local d
+  for d in "${dirs[@]}"; do
+    if [ ! -d "${DEST}/${d}" ]; then
+      mkdir -p "${DEST}/${d}" || fail "Could not create ${DEST}/${d} — grant write access for ${USER} without chmod 777"
+      log "Created missing directory: ${d}"
+    else
+      log "Present: ${d}"
+    fi
+  done
+
+  [ -d "${DEST}/storage/app" ] || fail "storage/app still missing after ensure step"
+}
+
 sync_application_code() {
   log "Synchronizing application code"
   log "Source: ${SOURCE}"
   log "Dest:   ${DEST}"
-  log "Preserving: .env, storage/, public/storage/, vendor/, node_modules/, runtime caches"
+  log "Preserving: .env, existing uploads, vendor/, node_modules/, runtime caches"
   log "rsync mode: archive + verbose (NO --delete)"
 
-  # Non-destructive sync. Intentionally omit --delete so production-only
-  # files (uploads, cached views that differ, etc.) are never removed.
+  # Non-destructive sync. Omit --delete so production-only files are never removed.
+  # Sync tracked storage scaffolds (.gitignore / safe brand assets) but never
+  # overwrite or clear user uploads, KYC docs, deposit proofs, or logs.
   rsync -av \
     --exclude='.git/' \
     --exclude='.github/' \
     --exclude='.env' \
     --exclude='.env.*' \
-    --exclude='storage/' \
     --exclude='public/storage/' \
     --exclude='vendor/' \
     --exclude='node_modules/' \
     --exclude='bootstrap/cache/*.php' \
     --exclude='scripts/vps-deploy.sh' \
+    --exclude='storage/*.key' \
+    --exclude='storage/*.xlsx' \
+    --exclude='storage/leads.xlsx' \
+    --exclude='storage/logs/*.log' \
+    --exclude='storage/framework/cache/data/*' \
+    --exclude='storage/framework/sessions/*' \
+    --exclude='storage/framework/views/*' \
+    --exclude='storage/app/public/photos/*' \
+    --exclude='storage/app/public/uploads/*' \
+    --exclude='storage/app/livewire-tmp/*' \
+    --exclude='storage/app/temp/*' \
     "${SOURCE}/" "${DEST}/" \
     || fail "rsync failed — check that ${USER} can write under ${DEST}"
 
@@ -115,6 +163,10 @@ verify_post_deploy() {
   [ -f .env ] || fail ".env disappeared during deploy"
   [ -d storage ] || fail "storage/ directory missing after deploy"
   [ -d storage/app ] || fail "storage/app missing after deploy"
+  [ -d storage/app/public ] || fail "storage/app/public missing after deploy"
+  [ -d storage/framework ] || fail "storage/framework missing after deploy"
+  [ -d storage/logs ] || fail "storage/logs missing after deploy"
+  [ -d bootstrap/cache ] || fail "bootstrap/cache missing after deploy"
   [ -d vendor ] || fail "vendor/ missing after composer install"
   [ -f vendor/autoload.php ] || fail "vendor/autoload.php missing"
 
@@ -137,6 +189,7 @@ main() {
   log "Skipping npm/webpack build (no tracked Mix output; app does not require it)"
 
   sync_application_code
+  ensure_storage_directories
   install_composer_dependencies
   refresh_laravel_caches
   verify_post_deploy
@@ -145,7 +198,7 @@ main() {
   log "Permissions: existing ownership on ${DEST} was left unchanged."
   log "If artisan/composer cannot write bootstrap/cache, grant write access for the deploy user on:"
   log "  ${DEST}/bootstrap/cache"
-  log "  ${DEST}/storage (already preserved; PHP-FPM must keep write access)"
+  log "  ${DEST}/storage (uploads preserved; PHP-FPM must keep write access)"
   log "Do NOT use chmod 777. Prefer group write for the PHP-FPM/web user only if needed."
 }
 

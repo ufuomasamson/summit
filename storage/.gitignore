@@ -1,2 +1,10 @@
 *
 !.gitignore
+!app/
+!app/**
+!framework/
+!framework/**
+!logs/
+!logs/**
+**/.DS_Store
+.DS_Store
