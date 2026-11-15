@@ -1,0 +1,54 @@
+name: Deploy Summit
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-summit-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          command_timeout: 25m
+          script: |
+            set -euo pipefail
+
+            CHECKOUT="/home/serveradmin/summit-inspect"
+            DEPLOY_SCRIPT="${CHECKOUT}/scripts/vps-deploy.sh"
+
+            echo "==> [$(date -u +%Y-%m-%dT%H:%M:%SZ)] Updating git checkout at ${CHECKOUT}"
+            cd "${CHECKOUT}"
+
+            git remote get-url origin >/dev/null
+            git fetch --prune origin main
+            git checkout main
+            git reset --hard origin/main
+
+            echo "==> Checkout now at commit: $(git rev-parse --short HEAD)"
+            git --no-pager log -1 --oneline
+
+            if [ ! -f "${DEPLOY_SCRIPT}" ]; then
+              echo "ERROR: Deployment script missing: ${DEPLOY_SCRIPT}" >&2
+              exit 1
+            fi
+
+            chmod +x "${DEPLOY_SCRIPT}"
+            echo "==> Running deployment script"
+            bash "${DEPLOY_SCRIPT}"
+
+            echo "==> [$(date -u +%Y-%m-%dT%H:%M:%SZ)] Deployment finished successfully"
