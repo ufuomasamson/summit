@@ -215,7 +215,7 @@
             </div>
             <h3 class="font-semibold text-sm mb-1 text-[#0D1B23]">Live Chat</h3>
             <p class="text-xs text-[#7A7A7A] mb-2">Chat with our team</p>
-            <button class="text-xs text-primary-500 hover:text-primary-400 font-medium">
+            <button type="button" onclick="window.openSummitLiveChat && window.openSummitLiveChat()" class="text-xs text-primary-500 hover:text-primary-400 font-medium">
                 Start Chat
             </button>
         </div>

@@ -47,6 +47,14 @@
                     <p>New User Application(s)</p>
                 </a>
             </li>
+
+                <li class="nav-item {{ request()->routeIs('admin.livechat*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.livechat') }}">
+                        <i class="fas fa-comments" aria-hidden="true"></i>
+                        <p>Live Chat</p>
+                        <span class="badge badge-success" id="admin-livechat-badge" style="display:none;">0</span>
+                    </a>
+                </li>
             
                 <li
                         class="nav-item {{ request()->routeIs('mwithdrawals') ? 'active' : '' }}   {{ request()->routeIs('processwithdraw') ? 'active' : '' }}">
@@ -471,3 +479,29 @@
     </div>
 </div>
 <!-- End Sidebar -->
+@unless(request()->routeIs('admin.livechat'))
+<script>
+(function () {
+    var badge = document.getElementById('admin-livechat-badge');
+    if (!badge) return;
+    function refresh() {
+        fetch('{{ route('admin.livechat.unread') }}', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            var n = parseInt(data.count, 10) || 0;
+            if (n > 0) {
+                badge.style.display = '';
+                badge.textContent = n > 99 ? '99+' : String(n);
+            } else {
+                badge.style.display = 'none';
+            }
+        })
+        .catch(function () {});
+    }
+    refresh();
+    setInterval(refresh, 15000);
+})();
+</script>
+@endunless

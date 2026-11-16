@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\SignalProvderController;
 use App\Http\Controllers\Admin\TopupController;
 use App\Http\Controllers\Admin\TradingAccountController;
 use App\Http\Controllers\Admin\TradingPaymentController;
+use App\Http\Controllers\Admin\LiveChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('adminlogin')->group(function () {
@@ -196,6 +197,15 @@ Route::middleware(['isadmin', '2fa'])->prefix('admin')->group(function () {
 	Route::get('dashboard/kyc-applications', [HomeController::class, 'kyc'])->name('kyc');
 	Route::post('dashboard/processkyc', [KycController::class, 'processKyc'])->name('processkyc');
 	Route::get('dashboard/kyc-application/{id}', [HomeController::class, 'viewKycApplication'])->name('viewkyc');
+
+	// Live Chat
+	Route::get('dashboard/livechat', [LiveChatController::class, 'index'])->name('admin.livechat');
+	Route::get('dashboard/livechat/conversations', [LiveChatController::class, 'conversations'])->name('admin.livechat.conversations');
+	Route::get('dashboard/livechat/unread', [LiveChatController::class, 'unreadCount'])->name('admin.livechat.unread');
+	Route::get('dashboard/livechat/{id}/messages', [LiveChatController::class, 'messages'])->name('admin.livechat.messages');
+	Route::post('dashboard/livechat/{id}/send', [LiveChatController::class, 'send'])->name('admin.livechat.send');
+	Route::post('dashboard/livechat/{id}/close', [LiveChatController::class, 'close'])->name('admin.livechat.close');
+	Route::post('dashboard/livechat/{id}/reopen', [LiveChatController::class, 'reopen'])->name('admin.livechat.reopen');
 
     Route::get('dashboard/dormant/{id}', [ManageUsersController::class, 'dormant']);
 	Route::get('dashboard/undormant/{id}', [ManageUsersController::class, 'undormant']);

@@ -20,6 +20,7 @@ use App\Http\Controllers\User\TransferController;
 use App\Http\Controllers\User\StatementController;
 use App\Http\Controllers\Auth\EmailCodeVerificationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\User\LiveChatController;
 use Illuminate\Support\Facades\Route;
 
 // Email verification routes (Code-based verification)
@@ -49,6 +50,12 @@ Route::middleware(['auth:sanctum', 'verified', 'check.banned'])->prefix('dashboa
 	Route::get('support', [ViewsController::class, 'support'])->name('support');
 	Route::get('pin', [ViewsController::class, 'pin'])->name('pin');
 	Route::post('pinstatus', [ViewsController::class, 'pinstatus'])->name('pinstatus');
+
+	// Live Chat (available before KYC completion so support stays reachable)
+	Route::get('livechat/bootstrap', [LiveChatController::class, 'bootstrap'])->name('user.livechat.bootstrap');
+	Route::get('livechat/poll', [LiveChatController::class, 'poll'])->name('user.livechat.poll');
+	Route::post('livechat/send', [LiveChatController::class, 'send'])->name('user.livechat.send');
+	Route::get('livechat/unread', [LiveChatController::class, 'unreadCount'])->name('user.livechat.unread');
 
 	Route::middleware('complete.kyc')->group(function () {
 		// Route::get('verify-account', [ViewsController::class, 'verifyaccount'])->name('account-verify');
