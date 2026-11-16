@@ -245,7 +245,7 @@
                     <!-- User Profile -->
                     <div class="text-center space-y-4">
                         <div class="relative inline-block">
-                            <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                            <img src="{{ profile_photo_url(Auth::user()) }}" 
                                  alt="{{ Auth::user()->name }}"
                                  class="w-20 h-20 rounded-xl object-cover border-2 border-[#C8D1D1]"
                                  onerror="this.src='{{ asset('dash/images/avatar.svg') }}'">

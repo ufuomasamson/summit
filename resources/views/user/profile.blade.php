@@ -19,7 +19,7 @@
             <!-- Profile Photo with Upload Overlay -->
             <div class="relative group">
                 @if(Auth::user()->profile_photo_path)
-                    <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                    <img src="{{ profile_photo_url(Auth::user()) }}" 
                          alt="{{ Auth::user()->name }}"
                          class="w-24 h-24 rounded-xl object-cover border-2 border-[#C8D1D1]">
                 @else
@@ -294,7 +294,7 @@
             <div class="flex justify-center mb-4">
                 <div class="relative">
                     @if(Auth::user()->profile_photo_path)
-                        <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                        <img src="{{ profile_photo_url(Auth::user()) }}" 
                              alt="Current"
                              class="w-24 h-24 rounded-xl object-cover border-2 border-[#C8D1D1]">
                     @else

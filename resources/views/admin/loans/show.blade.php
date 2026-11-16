@@ -177,7 +177,7 @@ $text = $bg == 'light' ? 'dark' : 'light';
                         <div class="card-body">
                             <div class="text-center mb-3">
                                 @if($loan->user->profile_photo_path)
-                                    <img src="{{ asset('storage/app/public/photos/' . $loan->user->profile_photo_path) }}" 
+                                    <img src="{{ profile_photo_url($loan->user) }}" 
                                          alt="{{ $loan->user->name }}" 
                                          class="avatar avatar-xxl mb-3">
                                 @else

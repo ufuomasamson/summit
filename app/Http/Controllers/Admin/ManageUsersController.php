@@ -800,28 +800,25 @@ public function card_activate($id)
         
 
         if ($request->hasfile('photo')) {
-
             $document1 = $request->file('photo');
-            $filename1 = $document1->getClientOriginalName();
-            $ext = array_pop(explode(".", $filename1));
-            $whitelist = array('jpeg', 'jpg', 'png');
+            $ext = strtolower($document1->getClientOriginalExtension() ?: $document1->extension() ?: '');
+            $whitelist = ['jpeg', 'jpg', 'png', 'webp'];
 
-            if (in_array($ext, $whitelist)) {
-
-                $cardname = $strtxt . $filename1 . time();
-                // save to storage/app/uploads as the new $filename
-                $path = $document1->storeAs('public/photos', $cardname);
-            } else {
+            if (!in_array($ext, $whitelist, true)) {
                 return redirect()->back()
                     ->with('message', 'Unaccepted Profile Image Uploaded, try renaming the image file');
             }
 
-            //update user photo path
-            User::where('id', $thisid)
-                ->update([
-                    'profile_photo_path' => $cardname,
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('photos');
+            $stored = $document1->store('photos', 'public');
+            $cardname = $stored ? basename($stored) : null;
 
-                ]);
+            if ($cardname) {
+                User::where('id', $thisid)
+                    ->update([
+                        'profile_photo_path' => $cardname,
+                    ]);
+            }
         }
 
 
@@ -834,42 +831,34 @@ public function card_activate($id)
 
     function profileimage(Request $request)
     {
-
-        $user = User::where('id', $request->id)->first();
         $this->validate($request, [
-            'photo' => 'mimes:jpg,jpeg,png|max:4000|image',
+            'photo' => 'mimes:jpg,jpeg,png,webp|max:4096|image',
         ]);
 
-
-
-        $strtxt = $this->RandomStringGenerator(6);
-
         if ($request->hasfile('photo')) {
-
             $document1 = $request->file('photo');
-            $filename1 = $document1->getClientOriginalName();
-            $ext = array_pop(explode(".", $filename1));
-            $whitelist = array('jpeg', 'jpg', 'png');
+            $ext = strtolower($document1->getClientOriginalExtension() ?: $document1->extension() ?: '');
+            $whitelist = ['jpeg', 'jpg', 'png', 'webp'];
 
-            if (in_array($ext, $whitelist)) {
-
-                $cardname = $strtxt . $filename1 . time();
-                // save to storage/app/uploads as the new $filename
-                $path = $document1->storeAs('public/photos', $cardname);
-            } else {
+            if (!in_array($ext, $whitelist, true)) {
                 return redirect()->back()
                     ->with('message', 'Unaccepted Profile Image Uploaded, try renaming the image file');
             }
 
-            //update user
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('photos');
+            $stored = $document1->store('photos', 'public');
+            if (!$stored) {
+                return redirect()->back()
+                    ->with('message', 'Could not save profile photo. Check storage permissions for www-data.');
+            }
+
             User::where('id', $request->user_id)
                 ->update([
-                    'profile_photo_path' => $cardname,
-
+                    'profile_photo_path' => basename($stored),
                 ]);
         }
         return redirect()->back()
-            ->with('success', 'Action Sucessful!Profile Photo Uploaded Successfully.');
+            ->with('success', 'Action Sucessful! Profile Photo Uploaded Successfully.');
     }
 
 

@@ -165,7 +165,7 @@
                                                         <input type="checkbox" wire:model='checkrecord'
                                                             value="{{ $user->id }}" />
                                                     </td>
-                                                    <td><img alt="" src="{{ asset('storage/app/public/photos/'.$user->profile_photo_path) }}" width="35" height="35" style='border-radius: 50%;'>{{ $user->name }}</td>
+                                                    <td><img alt="" src="{{ profile_photo_url($user) }}" width="35" height="35" style='border-radius: 50%;'>{{ $user->name }}</td>
                                                     <td>{{ $user->username }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->phone }}</td>

@@ -69,33 +69,23 @@ class VerifyController extends Controller
             ]);
             
             
-            $strtxt = $this->RandomStringGenerator(6);
-        
-        if($request->hasfile('photo')){
-
+        if ($request->hasfile('photo')) {
             $document1 = $request->file('photo');
-            $filename1 = $document1->getClientOriginalName();
-            $ext = array_pop(explode(".", $filename1));
-            $whitelist = array('jpeg','jpg','png');
-  
-            if (in_array($ext, $whitelist)) {
-  
-                  $cardname = $strtxt . $filename1 . time();
-                  // save to storage/app/uploads as the new $filename
-                  $path = $document1->storeAs('public/photos', $cardname);
-              
-  
-            } else {
-             $cardname = null;
+            $ext = strtolower($document1->getClientOriginalExtension() ?: $document1->extension() ?: '');
+            $whitelist = ['jpeg', 'jpg', 'png', 'webp'];
+            $cardname = null;
+
+            if (in_array($ext, $whitelist, true)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('photos');
+                $stored = $document1->store('photos', 'public');
+                $cardname = $stored ? basename($stored) : null;
             }
-          
-        //update user
-        User::where('id',Auth::user()->id)
-        ->update([
-            'profile_photo_path' => $cardname,
-           
-        ]);
-      }
+
+            User::where('id', Auth::user()->id)
+                ->update([
+                    'profile_photo_path' => $cardname,
+                ]);
+        }
 
         $settings = Settings::find(1);
         $message = "This is to inform you that $user->name just submitted a request for KYC(identity verification), please login your admin account to review and take neccessary action.";

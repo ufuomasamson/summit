@@ -81,7 +81,7 @@ if (Auth('admin')->User()->dashboard_style == 'light') {
                                     <div class="col-md-12 ">
 
                                         <img alt=""
-                                            src="{{ asset('storage/app/public/photos/' . $user->profile_photo_path) }}"
+                                            src="{{ profile_photo_url($user) }}"
                                             width="60" height="60" style='border-radius: 50%;'>
                                         <h1 class=" pl-2 d-inline text-primary">{{ $user->name }} {{ $user->middlename }}
                                             {{ $user->lastname }}</h1><span></span>

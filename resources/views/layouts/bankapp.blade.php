@@ -484,7 +484,7 @@ a, button, input, select, textarea {
                     <div x-data="{ profileOpen: false }" class="relative">
                         <button @click="profileOpen = !profileOpen" class="flex items-center space-x-2 lg:space-x-3 px-2 lg:px-3 py-2 rounded-lg hover:bg-[#DFE5E5] transition-colors group">
                             @if(Auth::user()->profile_photo_path)
-                                <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                                <img src="{{ profile_photo_url(Auth::user()) }}" 
                                      alt="{{ Auth::user()->name }}" 
                                      class="w-8 h-8 lg:w-9 lg:h-9 rounded-full object-cover border border-[#E0E5E5]">
                             @else
@@ -515,7 +515,7 @@ a, button, input, select, textarea {
                             <div class="p-3 lg:p-4 border-b border-[#E0E5E5]">
                                 <div class="flex items-center space-x-2 lg:space-x-3">
                                     @if(Auth::user()->profile_photo_path)
-                                        <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                                        <img src="{{ profile_photo_url(Auth::user()) }}" 
                                              alt="{{ Auth::user()->name }}" 
                                              class="w-10 h-10 lg:w-11 lg:h-11 rounded-full object-cover border border-[#E0E5E5]">
                                     @else
@@ -662,7 +662,7 @@ a, button, input, select, textarea {
                         <div class="relative">
                             <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 {{ request()->routeIs('profile') ? 'bg-primary-100' : 'group-active:bg-[#DFE5E5]' }}">
                                 @if(Auth::user()->profile_photo_path)
-                                    <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                                    <img src="{{ profile_photo_url(Auth::user()) }}" 
                                          alt="{{ Auth::user()->name }}" 
                                          class="w-7 h-7 rounded-full object-cover border {{ request()->routeIs('profile') ? 'border-primary-500' : 'border-[#E0E5E5]' }}">
                                 @else
@@ -717,7 +717,7 @@ a, button, input, select, textarea {
         <div class="p-6 border-b border-[#E0E5E5]">
             <div class="flex items-start space-x-4">
                 @if(Auth::user()->profile_photo_path)
-                    <img src="{{ asset('storage/app/public/photos/' . Auth::user()->profile_photo_path) }}" 
+                    <img src="{{ profile_photo_url(Auth::user()) }}" 
                          alt="{{ Auth::user()->name }}" 
                          class="w-14 h-14 rounded-full object-cover border border-[#E0E5E5] flex-shrink-0">
                 @else

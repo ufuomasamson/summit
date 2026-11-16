@@ -2,7 +2,7 @@
 
 /**
  * Helper functions for BankApp
- * 
+ *
  * These functions provide convenient access to common operations
  * throughout the application.
  */
@@ -10,10 +10,7 @@
 if (!function_exists('get_settings')) {
     /**
      * Get the application settings
-     * 
-     * Retrieves the settings from the database. This provides a centralized
-     * way to access site configuration across the application.
-     * 
+     *
      * @return \App\Models\Settings|null
      */
     function get_settings()
@@ -25,7 +22,7 @@ if (!function_exists('get_settings')) {
 if (!function_exists('format_currency')) {
     /**
      * Format amount with currency symbol
-     * 
+     *
      * @param float $amount
      * @param \App\Models\Settings|null $settings
      * @return string
@@ -37,15 +34,33 @@ if (!function_exists('format_currency')) {
     }
 }
 
+if (!function_exists('media_url')) {
+    /**
+     * Build a /media/{folder}/{file} URL served by MediaController.
+     * Works even when Nginx blocks /storage/*.
+     *
+     * @param  string  $folder  branding|photos
+     * @param  string  $file    basename
+     * @return string
+     */
+    function media_url($folder, $file)
+    {
+        $folder = basename(str_replace('\\', '/', (string) $folder));
+        $file = basename(str_replace('\\', '/', (string) $file));
+
+        if ($file === '' || $file === '.' || $file === '..') {
+            return '';
+        }
+
+        return url('/media/' . rawurlencode($folder) . '/' . rawurlencode($file));
+    }
+}
+
 if (!function_exists('branding_url')) {
     /**
-     * Public URL for logo/favicon (and other branding files).
+     * Public URL for logo/favicon.
      *
-     * New uploads live in public/branding/ so they work when Nginx blocks
-     * direct HTTP access to /storage (common on hardened aaPanel hosts).
-     * Legacy DB values like photos/xxx.png are still resolved.
-     *
-     * @param  string|null  $path  Relative path from settings.logo / settings.favicon
+     * @param  string|null  $path
      * @return string
      */
     function branding_url($path)
@@ -60,40 +75,56 @@ if (!function_exists('branding_url')) {
             return $path;
         }
 
-        // Preferred: files under public/branding
-        if (strpos($path, 'branding/') === 0 && is_file(public_path($path))) {
-            return asset($path);
+        $basename = basename($path);
+        if ($basename === '' || $basename === '.' || $basename === '..') {
+            return '';
+        }
+
+        // Logos may historically live under photos/ or branding/
+        $folder = 'branding';
+        if (strpos($path, 'photos/') === 0) {
+            $folder = is_file(public_path('branding/' . $basename)) ? 'branding' : 'photos';
+        }
+
+        return media_url($folder, $basename);
+    }
+}
+
+if (!function_exists('profile_photo_url')) {
+    /**
+     * Public URL for a user profile photo.
+     *
+     * @param  mixed  $userOrPath  User model/array or raw profile_photo_path
+     * @param  string  $fallback
+     * @return string
+     */
+    function profile_photo_url($userOrPath, $fallback = '')
+    {
+        $path = null;
+
+        if (is_object($userOrPath)) {
+            $path = $userOrPath->profile_photo_path ?? null;
+        } elseif (is_array($userOrPath)) {
+            $path = $userOrPath['profile_photo_path'] ?? null;
+        } else {
+            $path = $userOrPath;
+        }
+
+        if ($path === null || $path === '') {
+            return $fallback;
+        }
+
+        $path = ltrim(str_replace('\\', '/', (string) $path), '/');
+
+        if (preg_match('#^https?://#i', $path)) {
+            return $path;
         }
 
         $basename = basename($path);
-        if ($basename !== '' && is_file(public_path('branding/' . $basename))) {
-            return asset('branding/' . $basename);
+        if ($basename === '' || $basename === '.' || $basename === '..') {
+            return $fallback;
         }
 
-        // Standard Laravel public/storage symlink copy
-        if (is_file(public_path('storage/' . $path))) {
-            return asset('storage/' . $path);
-        }
-
-        // Promote legacy storage/app/public files into public/branding so they
-        // remain visible when Nginx blocks direct /storage/* access.
-        $legacy = storage_path('app/public/' . $path);
-        if ($basename !== '' && is_file($legacy)) {
-            $destDir = public_path('branding');
-            if (!is_dir($destDir)) {
-                @mkdir($destDir, 0775, true);
-            }
-            $dest = $destDir . DIRECTORY_SEPARATOR . $basename;
-            if (!is_file($dest)) {
-                @copy($legacy, $dest);
-                @chmod($dest, 0664);
-            }
-            if (is_file($dest)) {
-                return asset('branding/' . $basename);
-            }
-        }
-
-        // Last resort legacy URL
-        return asset('storage/app/public/' . $path);
+        return media_url('photos', $basename);
     }
 }

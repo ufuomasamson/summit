@@ -120,45 +120,45 @@ class ProfileController extends Controller
     // update Profile photo
     public function updateprofilephoto(Request $request)
     {
-
-
         $this->validate($request, [
-            'photo' => 'mimes:jpg,jpeg,png|max:4000|image',
+            'photo' => 'mimes:jpg,jpeg,png,webp|max:4096|image',
         ]);
 
-
-
-        $strtxt = $this->RandomStringGenerator(6);
-
-        if ($request->hasfile('photo')) {
-
+        if ($request->hasFile('photo')) {
             $document1 = $request->file('photo');
-            $filename1 = $document1->getClientOriginalName();
-            $ext = array_pop(explode(".", $filename1));
-            $whitelist = array('jpeg', 'jpg', 'png');
+            if (!$document1->isValid()) {
+                return redirect()->back()
+                    ->with('message', 'Profile image upload failed: ' . $document1->getErrorMessage());
+            }
 
-            if (in_array($ext, $whitelist)) {
+            $ext = strtolower($document1->getClientOriginalExtension() ?: $document1->extension() ?: '');
+            $whitelist = ['jpeg', 'jpg', 'png', 'webp'];
 
-                $cardname = $strtxt . $filename1 . time();
-                // save to storage/app/uploads as the new $filename
-                $path = $document1->storeAs('public/photos', $cardname);
-            } else {
+            if (!in_array($ext, $whitelist, true)) {
                 return redirect()->back()
                     ->with('message', 'Unaccepted Profile Image Uploaded, try renaming the image file');
             }
 
-            //update user
+            // Safe hashed name on the public disk → storage/app/public/photos/...
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('photos');
+            $stored = $document1->store('photos', 'public'); // e.g. photos/xyz.jpg
+            if (!$stored) {
+                return redirect()->back()
+                    ->with('message', 'Could not save profile photo. Check storage/app/public/photos permissions for www-data.');
+            }
+
+            $cardname = basename($stored);
+
             User::where('id', Auth::user()->id)
                 ->update([
                     'profile_photo_path' => $cardname,
-
                 ]);
-            
-            // Create profile photo update notification
+
             $this->notifyProfileUpdate(Auth::user()->id, 'profile photo');
         }
+
         return redirect()->back()
-            ->with('success', 'Action Sucessful!Profile Photo Uploaded Successfully.');
+            ->with('success', 'Action Sucessful! Profile Photo Uploaded Successfully.');
     }
     // for front end content management
     function RandomStringGenerator($n)

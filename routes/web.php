@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ClearCacheController;
+use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Settings;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -33,3 +34,10 @@ Route::get('/csrf-token', function () {
 
 // PWA Manifest Route
 Route::get('/manifest.json', [App\Http\Controllers\Admin\Settings\AppSettingsController::class, 'manifest'])->name('manifest');
+
+// Public media (logos + profile photos). Bypasses Nginx /storage deny rules.
+// Does NOT serve KYC uploads/ — only branding|photos.
+Route::get('/media/{folder}/{file}', [MediaController::class, 'show'])
+    ->where('folder', 'branding|photos')
+    ->where('file', '.*')
+    ->name('media.show');

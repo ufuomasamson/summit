@@ -4,7 +4,7 @@
          <!-- Modal content-->
          <div class="modal-content">
              <div class="modal-header ">
-                 <img alt="" src="{{ asset('storage/app/public/photos/' . $user->profile_photo_path) }}"
+                 <img alt="" src="{{ profile_photo_url($user) }}"
                      width="60" height="60" style='border-radius: 50%;'>
                  <h4 class="modal-title pl-1">Fund/Debit Account.</strong></h4>
                  <button type="button" class="close " data-dismiss="modal">&times;</button>
@@ -887,7 +887,7 @@ $('#topupModal').on('shown.bs.modal', function () {
          <div class="modal-content">
              <div class="modal-header ">
                  <h4 class="modal-title "> <img alt=""
-                         src="{{ $settings->site_address }}/storage/app/public/photos/{{ $user->profile_photo_path }}"
+                         src="{{ profile_photo_url($user) }}"
                          width="60" height="60" style='border-radius: 50%;'>
                      <h1 class="d-inline text-primary"> {{ $user->name }} {{ $user->l_name }}
                  </h4>
@@ -923,7 +923,7 @@ $('#topupModal').on('shown.bs.modal', function () {
          <!-- Modal content-->
          <div class="modal-content">
              <div class="modal-header ">
-                 <img alt="" src="{{ asset('storage/app/public/photos/' . $user->profile_photo_path) }}"
+                 <img alt="" src="{{ profile_photo_url($user) }}"
                      width="60" height="60" style='border-radius: 50%;'>
                  <h4 class="modal-title pl-1">Edit {{ $user->name }} details.</strong></h4>
                  <button type="button" class="close " data-dismiss="modal">&times;</button>
@@ -1242,7 +1242,7 @@ $('#topupModal').on('shown.bs.modal', function () {
      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
          <div class="modal-content">
              <div class="modal-header">
-                 <img alt="" src="{{ asset('storage/app/public/photos/' . $user->profile_photo_path) }}"
+                 <img alt="" src="{{ profile_photo_url($user) }}"
                      width="60" height="60" style='border-radius: 50%;'>
                  <h4 class="modal-title pl-1">Manage Transfer Limits for {{ $user->name }}</h4>
                  <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -1329,7 +1329,7 @@ $('#topupModal').on('shown.bs.modal', function () {
      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
          <div class="modal-content">
              <div class="modal-header">
-                 <img alt="" src="{{ asset('storage/app/public/photos/' . $user->profile_photo_path) }}"
+                 <img alt="" src="{{ profile_photo_url($user) }}"
                      width="60" height="60" style='border-radius: 50%;'>
                  <h4 class="modal-title pl-1">Change Account Status for {{ $user->name }}</h4>
                  <button type="button" class="close" data-dismiss="modal">&times;</button>

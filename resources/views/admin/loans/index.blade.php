@@ -194,7 +194,7 @@ $text = $bg == 'light' ? 'dark' : 'light';
                                     <td>
                                         <div class="d-flex align-items-center">
                                             @if($loan->user->profile_photo_path)
-                                                <img src="{{ asset('storage/app/public/photos/' . $loan->user->profile_photo_path) }}" 
+                                                <img src="{{ profile_photo_url($loan->user) }}" 
                                                      alt="{{ $loan->user->name }}" 
                                                      class="avatar avatar-sm mr-2">
                                             @else
