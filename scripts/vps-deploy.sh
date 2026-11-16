@@ -80,19 +80,29 @@ ensure_storage_directories() {
   [ -d "${DEST}/storage/app" ] || fail "storage/app still missing after ensure step"
 }
 
-# Detect the PHP-FPM / web user (aaPanel uses "www"; Debian/Nginx often "www-data").
+# Detect the PHP-FPM / web user.
+# Prefer the owner of the live PHP-FPM socket (this site uses www-data).
+# Do NOT prefer "www" just because the account exists — aaPanel boxes can
+# have both www and www-data while PHP-FPM runs as www-data.
 detect_web_user() {
-  local candidate
-  for candidate in www www-data nginx apache httpd; do
+  local sock owner candidate
+  for sock in /run/php/php8.2-fpm.sock /run/php/php-fpm.sock /tmp/php-cgi-82.sock /tmp/php-cgi.sock; do
+    if [ -S "${sock}" ]; then
+      owner="$(stat -c '%U' "${sock}" 2>/dev/null || true)"
+      if [ -n "${owner}" ] && [ "${owner}" != "root" ]; then
+        echo "${owner}"
+        return 0
+      fi
+    fi
+  done
+
+  # Fall back: first matching known web user (www-data before www)
+  for candidate in www-data www nginx apache httpd; do
     if id "${candidate}" >/dev/null 2>&1; then
       echo "${candidate}"
       return 0
     fi
   done
-  # Fall back: owner of the PHP-FPM socket if present
-  if [ -S /run/php/php8.2-fpm.sock ]; then
-    stat -c '%U' /run/php/php8.2-fpm.sock 2>/dev/null && return 0
-  fi
   return 1
 }
 
@@ -258,11 +268,11 @@ main() {
 
   log "Deployment succeeded"
   log "Storage permissions: owned/writable for PHP-FPM web user (no chmod 777)."
-  log "If logo/favicon uploads still fail, run:"
+  log "If logo/favicon uploads still fail, match the PHP-FPM user (this host: www-data):"
   log "  cd ${DEST}"
-  log "  sudo chown -R www:www storage bootstrap/cache"
+  log "  sudo chown -R www-data:www-data storage bootstrap/cache"
   log "  sudo chmod -R ug+rwX storage bootstrap/cache"
-  log "  ls -ld storage/app/public/photos"
+  log "  sudo -u www-data touch storage/app/public/photos/.wtest && sudo -u www-data rm storage/app/public/photos/.wtest"
 }
 
 main "$@"
