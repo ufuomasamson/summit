@@ -181,8 +181,7 @@
 
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <h5 class="text-{{ $text }}">Logo (Recommended size; max width, 200px and max height
-                        100px.)</h5>
+                    <h5 class="text-{{ $text }}">Logo (PNG/JPG/WebP; max width ~200px, height ~100px; up to 4MB)</h5>
                     @if(!empty($settings->logo))
                         <div class="mb-2 p-3 rounded" style="background:#f5f5f5;display:inline-block;">
                             <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
@@ -191,11 +190,10 @@
                         </div>
                         <p class="text-muted small mb-2">Current logo — upload a new file below to replace it.</p>
                     @endif
-                    <input name="logo" class="form-control " type="file" accept="image/png,image/jpeg,image/jpg">
+                    <input name="logo" class="form-control " type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif">
                 </div>
                 <div class="form-group col-md-6">
-                    <h5 class="text-{{ $text }}">Favicon (Recommended type: png, size: max width, 32px and max
-                        height 32px.)</h5>
+                    <h5 class="text-{{ $text }}">Favicon (PNG/ICO recommended, ~32×32px; up to 2MB)</h5>
                     @if(!empty($settings->favicon))
                         <div class="mb-2 p-3 rounded" style="background:#f5f5f5;display:inline-block;">
                             <img src="{{ asset('storage/app/public/' . $settings->favicon) }}"
@@ -203,7 +201,7 @@
                                  style="max-height:32px;max-width:32px;object-fit:contain;">
                         </div>
                     @endif
-                    <input name="favicon" class="form-control " type="file" accept="image/png,image/jpeg,image/jpg,image/x-icon">
+                    <input name="favicon" class="form-control " type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/x-icon,.ico">
                 </div>
             </div>
 

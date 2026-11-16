@@ -61,31 +61,56 @@ class AppSettingsController extends Controller
     // update wensite information
     public function updatewebinfo(Request $request)
     {
-
-        
         $this->validate($request, [
-            'logo' => 'mimes:jpg,jpeg,png|max:500|image',
-            'favicon' => 'mimes:jpg,jpeg,png,ico|max:500',
+            // max is kilobytes — 500 was rejecting normal logo files
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:4096',
+            'favicon' => 'nullable|file|mimes:jpg,jpeg,png,ico,webp,gif|max:2048',
         ]);
 
-        $settings = Settings::where('id', '=', '1')->first();
+        $settings = Settings::where('id', '=', '1')->firstOrFail();
 
-        if ($request->hasfile('logo')) {
+        // Ensure public disk photos directory exists (fresh deploys / missing scaffold)
+        Storage::disk('public')->makeDirectory('photos');
+
+        $path = $settings->logo;
+        if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            Storage::disk('public')->delete($settings->logo);
+            if (!$file->isValid()) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Logo upload failed: ' . $file->getErrorMessage());
+            }
+            if (!empty($settings->logo) && Storage::disk('public')->exists($settings->logo)) {
+                Storage::disk('public')->delete($settings->logo);
+            }
             $path = $file->store('photos', 'public');
-        } else {
-            $path  = $settings->logo;
+            if (!$path) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Could not save logo. Check that storage/app/public/photos is writable.');
+            }
         }
 
-        if ($request->hasfile('favicon')) {
+        $pathfav = $settings->favicon;
+        if ($request->hasFile('favicon')) {
             $favfile = $request->file('favicon');
-            Storage::disk('public')->delete($settings->favicon);
+            if (!$favfile->isValid()) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Favicon upload failed: ' . $favfile->getErrorMessage());
+            }
+            if (!empty($settings->favicon) && Storage::disk('public')->exists($settings->favicon)) {
+                Storage::disk('public')->delete($settings->favicon);
+            }
             $pathfav = $favfile->store('photos', 'public');
-        } else {
-            $pathfav = $settings->favicon;
+            if (!$pathfav) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Could not save favicon. Check that storage/app/public/photos is writable.');
+            }
         }
 
+        // Query builder bypasses casts — json_encode pwa_settings explicitly
         Settings::where('id', '1')
             ->update([
                 'newupdate' => $request['update'],
@@ -104,7 +129,7 @@ class AppSettingsController extends Controller
                 'tido' => $request->tido,
                 'address' => $request->address,
                 'sms' => $request->sms,
-                'card_fee'=> $request->card_fee,
+                'card_fee' => $request->card_fee,
                 'pwa_settings' => json_encode([
                     'short_name' => $request['pwa_short_name'],
                     'description' => $request['pwa_description'],
@@ -117,11 +142,26 @@ class AppSettingsController extends Controller
                 ]),
             ]);
 
+        // purchase_code field is commented out in the form — never crash the save
         $moreset = SettingsCont::find(1);
-        $moreset->purchase_code = $request->purchase_code;
-        $moreset->save();
+        if ($moreset && $request->exists('purchase_code')) {
+            $moreset->purchase_code = $request->purchase_code;
+            $moreset->save();
+        }
 
-        return redirect()->back()->with('success', 'Settings Saved successfully');
+        $uploaded = [];
+        if ($request->hasFile('logo')) {
+            $uploaded[] = 'logo';
+        }
+        if ($request->hasFile('favicon')) {
+            $uploaded[] = 'favicon';
+        }
+
+        $message = empty($uploaded)
+            ? 'Settings Saved successfully'
+            : 'Settings Saved successfully (' . implode(' & ', $uploaded) . ' updated)';
+
+        return redirect()->back()->with('success', $message);
     }
 
 
