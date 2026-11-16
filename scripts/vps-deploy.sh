@@ -80,6 +80,67 @@ ensure_storage_directories() {
   [ -d "${DEST}/storage/app" ] || fail "storage/app still missing after ensure step"
 }
 
+# Detect the PHP-FPM / web user (aaPanel uses "www"; Debian/Nginx often "www-data").
+detect_web_user() {
+  local candidate
+  for candidate in www www-data nginx apache httpd; do
+    if id "${candidate}" >/dev/null 2>&1; then
+      echo "${candidate}"
+      return 0
+    fi
+  done
+  # Fall back: owner of the PHP-FPM socket if present
+  if [ -S /run/php/php8.2-fpm.sock ]; then
+    stat -c '%U' /run/php/php8.2-fpm.sock 2>/dev/null && return 0
+  fi
+  return 1
+}
+
+# Make storage writable for PHP-FPM without chmod 777.
+# Prefer group-write shared between the deploy user and the web user.
+ensure_storage_permissions() {
+  log "Ensuring storage/bootstrap/cache are writable by PHP-FPM"
+  cd "${DEST}"
+
+  local web_user=""
+  if web_user="$(detect_web_user)"; then
+    log "Detected web user: ${web_user}"
+  else
+    log "WARNING: Could not detect web user (www/www-data). Skipping ownership adjust."
+    log "Run manually (aaPanel example):"
+    log "  cd ${DEST} && chgrp -R www storage bootstrap/cache && chmod -R ug+rwX storage bootstrap/cache"
+    return 0
+  fi
+
+  # Group-share writable dirs; do not recursively chown the whole site.
+  if chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null; then
+    log "Set group ${web_user} on storage/ and bootstrap/cache/"
+  else
+    log "WARNING: chgrp ${web_user} failed (need sudo or shared group)."
+    log "Fix now with:"
+    log "  sudo chgrp -R ${web_user} ${DEST}/storage ${DEST}/bootstrap/cache"
+    log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache"
+  fi
+
+  if chmod -R ug+rwX storage bootstrap/cache 2>/dev/null; then
+    log "Applied ug+rwX on storage/ and bootstrap/cache/ (not 777)"
+  else
+    log "WARNING: chmod ug+rwX failed on storage/bootstrap/cache"
+  fi
+
+  # setgid on directories so new uploads inherit the web group
+  find storage bootstrap/cache -type d -exec chmod g+s {} \; 2>/dev/null || true
+
+  # Sanity: photos must be writable by the web user for logo/favicon uploads
+  if [ -d storage/app/public/photos ]; then
+    if [ -w storage/app/public/photos ] || chmod ug+rwx storage/app/public/photos 2>/dev/null; then
+      log "photos/ is writable"
+    else
+      log "WARNING: storage/app/public/photos may not be writable by PHP-FPM"
+    fi
+  fi
+}
+
 sync_application_code() {
   log "Synchronizing application code"
   log "Source: ${SOURCE}"
@@ -190,16 +251,16 @@ main() {
 
   sync_application_code
   ensure_storage_directories
+  ensure_storage_permissions
   install_composer_dependencies
   refresh_laravel_caches
   verify_post_deploy
 
   log "Deployment succeeded"
-  log "Permissions: existing ownership on ${DEST} was left unchanged."
-  log "If artisan/composer cannot write bootstrap/cache, grant write access for the deploy user on:"
-  log "  ${DEST}/bootstrap/cache"
-  log "  ${DEST}/storage (uploads preserved; PHP-FPM must keep write access)"
-  log "Do NOT use chmod 777. Prefer group write for the PHP-FPM/web user only if needed."
+  log "Storage permissions: group-writable for PHP-FPM (no chmod 777)."
+  log "If logo/favicon uploads still fail, run:"
+  log "  sudo chgrp -R www ${DEST}/storage ${DEST}/bootstrap/cache"
+  log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache"
 }
 
 main "$@"

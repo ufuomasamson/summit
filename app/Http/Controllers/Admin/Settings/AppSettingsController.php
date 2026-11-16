@@ -83,11 +83,18 @@ class AppSettingsController extends Controller
             if (!empty($settings->logo) && Storage::disk('public')->exists($settings->logo)) {
                 Storage::disk('public')->delete($settings->logo);
             }
-            $path = $file->store('photos', 'public');
+            try {
+                $path = $file->store('photos', 'public');
+            } catch (\Throwable $e) {
+                \Log::error('Logo upload failed: ' . $e->getMessage());
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Could not save logo (permission error). On the VPS run: sudo chgrp -R www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache');
+            }
             if (!$path) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Could not save logo. Check that storage/app/public/photos is writable.');
+                    ->with('error', 'Could not save logo. storage/app/public/photos is not writable by PHP-FPM. On the VPS run: sudo chgrp -R www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache');
             }
         }
 
@@ -102,11 +109,18 @@ class AppSettingsController extends Controller
             if (!empty($settings->favicon) && Storage::disk('public')->exists($settings->favicon)) {
                 Storage::disk('public')->delete($settings->favicon);
             }
-            $pathfav = $favfile->store('photos', 'public');
+            try {
+                $pathfav = $favfile->store('photos', 'public');
+            } catch (\Throwable $e) {
+                \Log::error('Favicon upload failed: ' . $e->getMessage());
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Could not save favicon (permission error). On the VPS run: sudo chgrp -R www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache');
+            }
             if (!$pathfav) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Could not save favicon. Check that storage/app/public/photos is writable.');
+                    ->with('error', 'Could not save favicon. storage/app/public/photos is not writable by PHP-FPM.');
             }
         }
 
