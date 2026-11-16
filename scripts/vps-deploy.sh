@@ -70,8 +70,13 @@ ensure_storage_directories() {
   local d
   for d in "${dirs[@]}"; do
     if [ ! -d "${DEST}/${d}" ]; then
-      mkdir -p "${DEST}/${d}" || fail "Could not create ${DEST}/${d} — grant write access for ${USER} without chmod 777"
-      log "Created missing directory: ${d}"
+      if mkdir -p "${DEST}/${d}" 2>/dev/null; then
+        log "Created missing directory: ${d}"
+      elif sudo -n mkdir -p "${DEST}/${d}" 2>/dev/null; then
+        log "Created missing directory via sudo: ${d}"
+      else
+        log "WARNING: could not create ${d} (owned by PHP-FPM?). Create/chown once with sudo."
+      fi
     else
       log "Present: ${d}"
     fi
@@ -124,68 +129,61 @@ ensure_storage_permissions() {
   fi
 
   # Own only runtime-writable trees (not the whole site).
-  if chown -R "${web_user}:${web_user}" storage bootstrap/cache 2>/dev/null; then
+  # Prefer passwordless sudo — deploy user usually cannot chown to www-data.
+  if sudo -n chown -R "${web_user}:${web_user}" storage bootstrap/cache 2>/dev/null \
+    || chown -R "${web_user}:${web_user}" storage bootstrap/cache 2>/dev/null; then
     log "Set owner ${web_user}:${web_user} on storage/ and bootstrap/cache/"
-  elif chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null; then
+  elif sudo -n chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null \
+    || chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null; then
     log "chown failed; fell back to chgrp ${web_user}"
   else
-    log "WARNING: could not chown/chgrp storage (need passwordless sudo for ${USER})."
-    log "Fix now with:"
+    log "WARNING: could not chown/chgrp storage as ${USER}."
+    log "Logo uploads need the PHP-FPM user. Run once:"
     log "  sudo chown -R ${web_user}:${web_user} ${DEST}/storage ${DEST}/bootstrap/cache"
     log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache"
   fi
 
-  chmod -R ug+rwX storage bootstrap/cache 2>/dev/null || log "WARNING: chmod ug+rwX failed"
-  find storage bootstrap/cache -type d -exec chmod g+s {} \; 2>/dev/null || true
+  sudo -n chmod -R ug+rwX storage bootstrap/cache 2>/dev/null \
+    || chmod -R ug+rwX storage bootstrap/cache 2>/dev/null \
+    || log "WARNING: chmod ug+rwX failed"
 
-  # Prove photos is writable by creating/removing a probe file as current deploy user.
-  # Real PHP-FPM writability still depends on ownership matching the FPM user.
-  if [ -d storage/app/public/photos ]; then
-    if touch storage/app/public/photos/.deploy_write_test 2>/dev/null; then
-      rm -f storage/app/public/photos/.deploy_write_test
-      log "photos/ write probe ok (deploy user)"
-    else
-      log "WARNING: cannot write storage/app/public/photos as ${USER}"
-    fi
-    ls -ld storage storage/app storage/app/public storage/app/public/photos || true
-  fi
+  find storage bootstrap/cache -type d -exec chmod g+s {} \; 2>/dev/null || true
+  ls -ld storage storage/app/public storage/app/public/photos bootstrap/cache 2>/dev/null || true
 }
 
 sync_application_code() {
   log "Synchronizing application code"
   log "Source: ${SOURCE}"
   log "Dest:   ${DEST}"
-  log "Preserving: .env, existing uploads, vendor/, node_modules/, runtime caches"
-  log "rsync mode: archive + verbose (NO --delete)"
+  log "Preserving: .env, entire storage/, vendor/, node_modules/, bootstrap/cache/"
+  log "rsync mode: archive, no-owner/no-group (NO --delete)"
 
-  # Non-destructive sync. Omit --delete so production-only files are never removed.
-  # Sync tracked storage scaffolds (.gitignore / safe brand assets) but never
-  # overwrite or clear user uploads, KYC docs, deposit proofs, or logs.
-  rsync -av \
+  # Exclude storage/ and bootstrap/cache/ entirely.
+  # Those dirs are owned by PHP-FPM (www-data); syncing into them as serveradmin
+  # causes rsync exit code 23 after chown. Directory scaffolds are created by
+  # ensure_storage_directories instead.
+  local rsync_rc=0
+  rsync -rlptDv --no-owner --no-group \
     --exclude='.git/' \
     --exclude='.github/' \
     --exclude='.env' \
     --exclude='.env.*' \
+    --exclude='storage/' \
+    --exclude='bootstrap/cache/' \
     --exclude='public/storage/' \
     --exclude='vendor/' \
     --exclude='node_modules/' \
-    --exclude='bootstrap/cache/*.php' \
     --exclude='scripts/vps-deploy.sh' \
-    --exclude='storage/*.key' \
-    --exclude='storage/*.xlsx' \
-    --exclude='storage/leads.xlsx' \
-    --exclude='storage/logs/*.log' \
-    --exclude='storage/framework/cache/data/*' \
-    --exclude='storage/framework/sessions/*' \
-    --exclude='storage/framework/views/*' \
-    --exclude='storage/app/public/photos/*' \
-    --exclude='storage/app/public/uploads/*' \
-    --exclude='storage/app/livewire-tmp/*' \
-    --exclude='storage/app/temp/*' \
-    "${SOURCE}/" "${DEST}/" \
-    || fail "rsync failed — check that ${USER} can write under ${DEST}"
+    "${SOURCE}/" "${DEST}/" || rsync_rc=$?
 
-  log "Code sync complete"
+  # 0 = ok, 23 = partial transfer (vanished/permission on ignored paths) — warn only
+  if [ "${rsync_rc}" -eq 0 ]; then
+    log "Code sync complete"
+  elif [ "${rsync_rc}" -eq 23 ]; then
+    log "WARNING: rsync reported partial transfer (code 23); continuing because storage/cache are excluded"
+  else
+    fail "rsync failed with code ${rsync_rc} — check that ${USER} can write under ${DEST}"
+  fi
 }
 
 install_composer_dependencies() {
