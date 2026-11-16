@@ -58,6 +58,88 @@ class AppSettingsController extends Controller
 
         return redirect()->back()->with('success', 'Settings Saved successfully');
     }
+    /**
+     * Save an uploaded branding image into storage/app/public/photos.
+     * Uses a direct filesystem move so aaPanel/open_basedir issues surface clearly.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  string|null  $oldRelativePath  e.g. photos/old.png
+     * @return array{0: ?string, 1: ?string}  [relativePath, errorMessage]
+     */
+    protected function storePublicPhoto($file, $oldRelativePath = null): array
+    {
+        if (!$file->isValid()) {
+            return [null, 'Upload invalid: ' . $file->getErrorMessage()];
+        }
+
+        $photosDir = storage_path('app/public/photos');
+
+        if (!is_dir($photosDir) && !@mkdir($photosDir, 0775, true) && !is_dir($photosDir)) {
+            return [null, $this->storagePermissionHint($photosDir, 'Could not create photos directory')];
+        }
+
+        if (!is_writable($photosDir)) {
+            return [null, $this->storagePermissionHint($photosDir, 'photos directory is not writable')];
+        }
+
+        // Remove previous file when present
+        if (!empty($oldRelativePath)) {
+            $oldAbsolute = storage_path('app/public/' . ltrim(str_replace('\\', '/', $oldRelativePath), '/'));
+            if (is_file($oldAbsolute)) {
+                @unlink($oldAbsolute);
+            }
+        }
+
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'png');
+        $filename = uniqid('brand_', true) . '.' . $extension;
+        $relative = 'photos/' . $filename;
+        $absolute = $photosDir . DIRECTORY_SEPARATOR . $filename;
+
+        try {
+            // Prefer native move — more reliable than Flysystem on some panels
+            $file->move($photosDir, $filename);
+        } catch (\Throwable $e) {
+            \Log::error('Brand image move failed: ' . $e->getMessage(), [
+                'php_user' => $this->currentPhpUser(),
+                'photos_dir' => $photosDir,
+            ]);
+            return [null, $this->storagePermissionHint($photosDir, 'move failed: ' . $e->getMessage())];
+        }
+
+        if (!is_file($absolute)) {
+            return [null, $this->storagePermissionHint($photosDir, 'file missing after move')];
+        }
+
+        @chmod($absolute, 0664);
+
+        return [$relative, null];
+    }
+
+    protected function currentPhpUser(): string
+    {
+        if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
+            $info = @posix_getpwuid(posix_geteuid());
+            if (!empty($info['name'])) {
+                return $info['name'];
+            }
+        }
+
+        return get_current_user() ?: (string) getmyuid();
+    }
+
+    protected function storagePermissionHint(string $photosDir, string $reason): string
+    {
+        $phpUser = $this->currentPhpUser();
+        $siteRoot = base_path();
+
+        return "Could not save image ({$reason}). "
+            . "PHP runs as [{$phpUser}]; target [{$photosDir}]. "
+            . "On the VPS run exactly: "
+            . "cd {$siteRoot} && "
+            . "sudo chown -R {$phpUser}:{$phpUser} storage bootstrap/cache && "
+            . "sudo chmod -R ug+rwX storage bootstrap/cache";
+    }
+
     // update wensite information
     public function updatewebinfo(Request $request)
     {
@@ -69,58 +151,19 @@ class AppSettingsController extends Controller
 
         $settings = Settings::where('id', '=', '1')->firstOrFail();
 
-        // Ensure public disk photos directory exists (fresh deploys / missing scaffold)
-        Storage::disk('public')->makeDirectory('photos');
-
         $path = $settings->logo;
         if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-            if (!$file->isValid()) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Logo upload failed: ' . $file->getErrorMessage());
-            }
-            if (!empty($settings->logo) && Storage::disk('public')->exists($settings->logo)) {
-                Storage::disk('public')->delete($settings->logo);
-            }
-            try {
-                $path = $file->store('photos', 'public');
-            } catch (\Throwable $e) {
-                \Log::error('Logo upload failed: ' . $e->getMessage());
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Could not save logo (permission error). On the VPS run: sudo chgrp -R www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache');
-            }
-            if (!$path) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Could not save logo. storage/app/public/photos is not writable by PHP-FPM. On the VPS run: sudo chgrp -R www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache');
+            [$path, $error] = $this->storePublicPhoto($request->file('logo'), $settings->logo);
+            if ($error) {
+                return redirect()->back()->withInput()->with('error', $error);
             }
         }
 
         $pathfav = $settings->favicon;
         if ($request->hasFile('favicon')) {
-            $favfile = $request->file('favicon');
-            if (!$favfile->isValid()) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Favicon upload failed: ' . $favfile->getErrorMessage());
-            }
-            if (!empty($settings->favicon) && Storage::disk('public')->exists($settings->favicon)) {
-                Storage::disk('public')->delete($settings->favicon);
-            }
-            try {
-                $pathfav = $favfile->store('photos', 'public');
-            } catch (\Throwable $e) {
-                \Log::error('Favicon upload failed: ' . $e->getMessage());
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Could not save favicon (permission error). On the VPS run: sudo chgrp -R www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache');
-            }
-            if (!$pathfav) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Could not save favicon. storage/app/public/photos is not writable by PHP-FPM.');
+            [$pathfav, $error] = $this->storePublicPhoto($request->file('favicon'), $settings->favicon);
+            if ($error) {
+                return redirect()->back()->withInput()->with('error', $error);
             }
         }
 

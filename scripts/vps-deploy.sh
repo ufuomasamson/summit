@@ -97,7 +97,8 @@ detect_web_user() {
 }
 
 # Make storage writable for PHP-FPM without chmod 777.
-# Prefer group-write shared between the deploy user and the web user.
+# aaPanel typically needs the web user as OWNER (chgrp alone is often not enough
+# when dirs were created by serveradmin as 755).
 ensure_storage_permissions() {
   log "Ensuring storage/bootstrap/cache are writable by PHP-FPM"
   cd "${DEST}"
@@ -107,37 +108,36 @@ ensure_storage_permissions() {
     log "Detected web user: ${web_user}"
   else
     log "WARNING: Could not detect web user (www/www-data). Skipping ownership adjust."
-    log "Run manually (aaPanel example):"
-    log "  cd ${DEST} && chgrp -R www storage bootstrap/cache && chmod -R ug+rwX storage bootstrap/cache"
+    log "Run manually (aaPanel):"
+    log "  cd ${DEST} && sudo chown -R www:www storage bootstrap/cache && sudo chmod -R ug+rwX storage bootstrap/cache"
     return 0
   fi
 
-  # Group-share writable dirs; do not recursively chown the whole site.
-  if chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null; then
-    log "Set group ${web_user} on storage/ and bootstrap/cache/"
+  # Own only runtime-writable trees (not the whole site).
+  if chown -R "${web_user}:${web_user}" storage bootstrap/cache 2>/dev/null; then
+    log "Set owner ${web_user}:${web_user} on storage/ and bootstrap/cache/"
+  elif chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null; then
+    log "chown failed; fell back to chgrp ${web_user}"
   else
-    log "WARNING: chgrp ${web_user} failed (need sudo or shared group)."
+    log "WARNING: could not chown/chgrp storage (need passwordless sudo for ${USER})."
     log "Fix now with:"
-    log "  sudo chgrp -R ${web_user} ${DEST}/storage ${DEST}/bootstrap/cache"
+    log "  sudo chown -R ${web_user}:${web_user} ${DEST}/storage ${DEST}/bootstrap/cache"
     log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache"
   fi
 
-  if chmod -R ug+rwX storage bootstrap/cache 2>/dev/null; then
-    log "Applied ug+rwX on storage/ and bootstrap/cache/ (not 777)"
-  else
-    log "WARNING: chmod ug+rwX failed on storage/bootstrap/cache"
-  fi
-
-  # setgid on directories so new uploads inherit the web group
+  chmod -R ug+rwX storage bootstrap/cache 2>/dev/null || log "WARNING: chmod ug+rwX failed"
   find storage bootstrap/cache -type d -exec chmod g+s {} \; 2>/dev/null || true
 
-  # Sanity: photos must be writable by the web user for logo/favicon uploads
+  # Prove photos is writable by creating/removing a probe file as current deploy user.
+  # Real PHP-FPM writability still depends on ownership matching the FPM user.
   if [ -d storage/app/public/photos ]; then
-    if [ -w storage/app/public/photos ] || chmod ug+rwx storage/app/public/photos 2>/dev/null; then
-      log "photos/ is writable"
+    if touch storage/app/public/photos/.deploy_write_test 2>/dev/null; then
+      rm -f storage/app/public/photos/.deploy_write_test
+      log "photos/ write probe ok (deploy user)"
     else
-      log "WARNING: storage/app/public/photos may not be writable by PHP-FPM"
+      log "WARNING: cannot write storage/app/public/photos as ${USER}"
     fi
+    ls -ld storage storage/app storage/app/public storage/app/public/photos || true
   fi
 }
 
@@ -257,10 +257,12 @@ main() {
   verify_post_deploy
 
   log "Deployment succeeded"
-  log "Storage permissions: group-writable for PHP-FPM (no chmod 777)."
+  log "Storage permissions: owned/writable for PHP-FPM web user (no chmod 777)."
   log "If logo/favicon uploads still fail, run:"
-  log "  sudo chgrp -R www ${DEST}/storage ${DEST}/bootstrap/cache"
-  log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache"
+  log "  cd ${DEST}"
+  log "  sudo chown -R www:www storage bootstrap/cache"
+  log "  sudo chmod -R ug+rwX storage bootstrap/cache"
+  log "  ls -ld storage/app/public/photos"
 }
 
 main "$@"
