@@ -1,7 +1,7 @@
 <header class="nx-nav" data-nx-nav>
     <div class="nx-nav__inner">
         <a href="{{ route('home') }}" class="nx-nav__brand" aria-label="{{ $settings->site_name }} home">
-            <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+            <img src="{{ branding_url($settings->logo) }}"
                  alt="{{ $settings->site_name }}"
                  class="nx-nav__logo"
                  width="160"

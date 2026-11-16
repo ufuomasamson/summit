@@ -184,7 +184,7 @@
                     <h5 class="text-{{ $text }}">Logo (PNG/JPG/WebP; max width ~200px, height ~100px; up to 4MB)</h5>
                     @if(!empty($settings->logo))
                         <div class="mb-2 p-3 rounded" style="background:#f5f5f5;display:inline-block;">
-                            <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+                            <img src="{{ branding_url($settings->logo) }}"
                                  alt="Current logo"
                                  style="max-height:64px;max-width:200px;object-fit:contain;">
                         </div>
@@ -196,7 +196,7 @@
                     <h5 class="text-{{ $text }}">Favicon (PNG/ICO recommended, ~32×32px; up to 2MB)</h5>
                     @if(!empty($settings->favicon))
                         <div class="mb-2 p-3 rounded" style="background:#f5f5f5;display:inline-block;">
-                            <img src="{{ asset('storage/app/public/' . $settings->favicon) }}"
+                            <img src="{{ branding_url($settings->favicon) }}"
                                  alt="Current favicon"
                                  style="max-height:32px;max-width:32px;object-fit:contain;">
                         </div>

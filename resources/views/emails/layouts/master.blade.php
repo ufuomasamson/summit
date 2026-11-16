@@ -266,7 +266,7 @@
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td align="center">
-                                        <img src="{{ url('storage/app/public/' . $settings->logo) }}" alt="{{ $settings->site_name }}" style="max-width: 160px; height: auto; display: block; margin: 0 auto;">
+                                        <img src="{{ branding_url($settings->logo) }}" alt="{{ $settings->site_name }}" style="max-width: 160px; height: auto; display: block; margin: 0 auto;">
                                     </td>
                                 </tr>
                                 <tr>
@@ -319,7 +319,7 @@
                                 <!-- Logo -->
                                 <tr>
                                     <td align="center" style="padding-bottom: 16px;">
-                                        <img src="{{ url('storage/app/public/' . $settings->logo) }}" alt="{{ $settings->site_name }}" style="max-width: 110px; height: auto; opacity: 0.8;">
+                                        <img src="{{ branding_url($settings->logo) }}" alt="{{ $settings->site_name }}" style="max-width: 110px; height: auto; opacity: 0.8;">
                                     </td>
                                 </tr>
                                 <!-- Bank & Address -->

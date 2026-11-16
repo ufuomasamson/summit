@@ -57,6 +57,22 @@ class Settings extends Model
         return $this->pwa_settings['enabled'] ?? true;
     }
 
+    /**
+     * Web-accessible logo URL (public/branding preferred over /storage).
+     */
+    public function getLogoUrlAttribute()
+    {
+        return branding_url($this->attributes['logo'] ?? null);
+    }
+
+    /**
+     * Web-accessible favicon URL.
+     */
+    public function getFaviconUrlAttribute()
+    {
+        return branding_url($this->attributes['favicon'] ?? null);
+    }
+
     // public function getModulesAttribute($value)
     // {
     //     return ucfirst($value);

@@ -11,8 +11,8 @@
     <title>{{ $settings->site_name }} | @yield('title')</title>
     <meta name="description" content="{{ $settings->pwa_description ?? $settings->site_name }}">
     <meta name="keywords" content="{{ $settings->keywords }}" />
-    <link rel="icon" type="image/png" href="{{ asset('storage/app/public/' . $settings->favicon) }}" sizes="32x32">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('storage/app/public/' . $settings->logo) }}">
+    <link rel="icon" type="image/png" href="{{ branding_url($settings->favicon) }}" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ branding_url($settings->logo) }}">
     
     @if($settings->pwa_enabled ?? true)
     <!-- PWA Meta Tags -->
@@ -24,9 +24,9 @@
     <link rel="manifest" href="{{ route('manifest') }}">
     
     <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="167x167" href="{{ asset('storage/app/public/' . $settings->logo) }}">
+    <link rel="apple-touch-icon" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="167x167" href="{{ branding_url($settings->logo) }}">
     @endif
     
     <!-- Tailwind CSS -->
@@ -310,7 +310,7 @@ a, button, input, select, textarea {
                 
                 <!-- Logo (centered) -->
                 <div class="absolute left-1/2 -translate-x-1/2 flex items-center">
-                    <img src="{{ asset('storage/app/public/' . $settings->logo) }}" alt="{{ $settings->site_name }}" class="h-7 md:h-9 w-auto object-contain">
+                    <img src="{{ branding_url($settings->logo) }}" alt="{{ $settings->site_name }}" class="h-7 md:h-9 w-auto object-contain">
                 </div>
                 
                 <!-- Language Selector -->

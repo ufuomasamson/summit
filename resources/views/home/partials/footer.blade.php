@@ -6,7 +6,7 @@
     <div class="nx-footer__inner">
         <div class="nx-footer__brand">
             <a href="{{ route('home') }}" class="nx-footer__logo-wrap" aria-label="{{ $settings->site_name }} home">
-                <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+                <img src="{{ branding_url($settings->logo) }}"
                      alt="{{ $settings->site_name }}"
                      width="140"
                      height="48">

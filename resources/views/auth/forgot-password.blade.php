@@ -10,7 +10,7 @@
         <div class="hidden lg:block space-y-8 animate-slide-in">
             <!-- Logo -->
             <div class="mb-8">
-                <img src="{{ asset('storage/app/public/' . $settings->logo) }}" 
+                <img src="{{ branding_url($settings->logo) }}" 
                      alt="{{ $settings->site_name }}" 
                      class="h-12 w-auto mb-6">
             </div>
@@ -79,7 +79,7 @@
         <div class="w-full">
             <!-- Mobile Logo -->
             <div class="lg:hidden text-center mb-8">
-                <img src="{{ asset('storage/app/public/' . $settings->logo) }}" 
+                <img src="{{ branding_url($settings->logo) }}" 
                      alt="{{ $settings->site_name }}" 
                      class="h-10 w-auto mx-auto">
             </div>

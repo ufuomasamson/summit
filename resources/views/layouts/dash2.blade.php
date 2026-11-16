@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Swift and Secure Money Transfer to any UK bank account will become a breeze with {{$settings->site_name}}." />
   <meta name="csrf_token" content="{{ csrf_token() }}" id="csrf_token" data-turbolinks-permanent>
-  <link rel="shortcut icon" href="{{ asset('storage/app/public/' . $settings->favicon) }}" />
+  <link rel="shortcut icon" href="{{ branding_url($settings->favicon) }}" />
   <link rel="stylesheet" href="{{ asset('dash2/libs/%40fortawesome/fontawesome-pro/css/all.min.css') }}">
   <link href="{{ asset('dash2/konanauth/public/asset/fonts/fontawesome/css/all.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ asset('dash2/public/dashboard/plugins/custom/leaflet/leaflet.bundle.css') }}" rel="stylesheet" type="text/css" />
@@ -182,8 +182,8 @@ pre,code,kbd,samp
       <div id="kt_aside" class="aside aside-default bg-white aside-hoverable" data-kt-drawer="true" data-kt-drawer-name="aside" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_aside_toggle">
         <div class="aside-logo flex-column-auto pt-9 pb-5" id="kt_aside_logo">
           <a href="/">
-            <img alt="Logo" src="{{ asset('storage/app/public/'.$settings->logo)}}" class="logo-default" style="height:auto; max-width:30%;"/>
-            <img alt="Logo" src="{{ asset('storage/app/public/'.$settings->logo)}}" class="h-50px logo-minimize" style="height:auto; max-width:30%;"/>
+            <img alt="Logo" src="{{ branding_url($settings->logo)}}" class="logo-default" style="height:auto; max-width:30%;"/>
+            <img alt="Logo" src="{{ branding_url($settings->logo)}}" class="h-50px logo-minimize" style="height:auto; max-width:30%;"/>
           </a>
         </div>
         <div class="aside-menu flex-column-fluid">
@@ -312,7 +312,7 @@ pre,code,kbd,samp
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
           <!--begin::Logo-->
           <a href="{{ route('dashboard') }}" class="d-lg-none">
-            <img alt="Logo" src="{{ asset('storage/app/public/'.$settings->logo)}}" style="height:auto; max-width:30%;"/>
+            <img alt="Logo" src="{{ branding_url($settings->logo)}}" style="height:auto; max-width:30%;"/>
           </a>
           <!--end::Logo-->
         </div>

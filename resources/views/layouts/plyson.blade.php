@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="description" content="Mobile Banking, Credit Cards, Mortgages, Auto Loan">
-    <meta property="og:image" content="{{ asset('storage/app/public/' . $settings->favicon) }}">
+    <meta property="og:image" content="{{ branding_url($settings->favicon) }}">
     <title>{{ $settings->site_name }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('storage/app/public/' . $settings->favicon) }}">
+    <link rel="icon" type="image/png" href="{{ branding_url($settings->favicon) }}">
 
     @if($settings->pwa_enabled ?? true)
     <!-- PWA Meta Tags -->
@@ -18,9 +18,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="{{ $settings->pwa_short_name ?? $settings->site_name }}">
     <link rel="manifest" href="{{ route('manifest') }}">
-    <link rel="apple-touch-icon" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('storage/app/public/' . $settings->logo) }}">
+    <link rel="apple-touch-icon" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ branding_url($settings->logo) }}">
     @endif
 
     <!-- Google Fonts -->
@@ -213,7 +213,7 @@
 
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex-shrink-0">
-                <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+                <img src="{{ branding_url($settings->logo) }}"
                      alt="{{ $settings->site_name }}"
                      style="width:260px; max-height:80px; object-fit:contain;">
             </a>
@@ -326,7 +326,7 @@
         <div class="max-w-[1400px] mx-auto px-6 w-full flex items-center justify-between gap-6">
 
             <a href="{{ route('home') }}" class="flex-shrink-0">
-                <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+                <img src="{{ branding_url($settings->logo) }}"
                      alt="{{ $settings->site_name }}"
                      style="height:39px; object-fit:contain;">
             </a>
@@ -400,7 +400,7 @@
 
         <!-- Logo centered -->
         <a href="{{ route('home') }}">
-            <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+            <img src="{{ branding_url($settings->logo) }}"
                  alt="{{ $settings->site_name }}"
                  style="height:39px; object-fit:contain;">
         </a>
@@ -482,7 +482,7 @@
             <!-- Col 1 â€” Logo + Social -->
             <div>
                 <a href="{{ route('home') }}">
-                    <img src="{{ asset('storage/app/public/' . $settings->logo) }}"
+                    <img src="{{ branding_url($settings->logo) }}"
                          alt="{{ $settings->site_name }}"
                          style="width:185px; object-fit:contain;"
                          class="mb-5">

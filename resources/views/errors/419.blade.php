@@ -8,7 +8,7 @@
 	<title>Session Expired - {{ $settings->site_name ?? 'Summit Bank' }}</title>
 	<meta name="theme-color" content="#c10e0e">
 	@if(isset($settings) && !empty($settings->favicon))
-		<link rel="shortcut icon" href="{{ asset('storage/app/public/' . $settings->favicon) }}" />
+		<link rel="shortcut icon" href="{{ branding_url($settings->favicon) }}" />
 	@endif
 
 	<script src="https://cdn.tailwindcss.com"></script>

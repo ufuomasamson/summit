@@ -12,7 +12,7 @@
     <meta name="description" content="Swift and Secure Money Transfer to any bank account will become a breeze with {{ $settings->site_name }}." />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="theme-color" content="#c10e0e">
-    <link rel="shortcut icon" href="{{ asset('storage/app/public/' . $settings->favicon) }}" />
+    <link rel="shortcut icon" href="{{ branding_url($settings->favicon) }}" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>

@@ -7,16 +7,16 @@
     <meta name="description" content="{{ $settings->site_name }} — Instant transfers, digital cards, investments and savings. Banking made easily, fast, and secure.">
     <meta property="og:title" content="{{ $settings->site_name }}">
     <meta property="og:description" content="Banking made easily. Fast. Secure. Borderless.">
-    <meta property="og:image" content="{{ asset('storage/app/public/' . $settings->favicon) }}">
+    <meta property="og:image" content="{{ branding_url($settings->favicon) }}">
     <title>{{ $settings->site_name }} — Banking Made Easily</title>
-    <link rel="icon" type="image/png" href="{{ asset('storage/app/public/' . $settings->favicon) }}">
+    <link rel="icon" type="image/png" href="{{ branding_url($settings->favicon) }}">
 
     @if($settings->pwa_enabled ?? true)
     <meta name="theme-color" content="{{ $settings->pwa_theme_color ?? '#D6001C' }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="{{ $settings->pwa_short_name ?? $settings->site_name }}">
     <link rel="manifest" href="{{ route('manifest') }}">
-    <link rel="apple-touch-icon" href="{{ asset('storage/app/public/' . $settings->logo) }}">
+    <link rel="apple-touch-icon" href="{{ branding_url($settings->logo) }}">
     @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

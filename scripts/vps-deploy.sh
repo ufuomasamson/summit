@@ -65,6 +65,7 @@ ensure_storage_directories() {
     storage/framework/views
     storage/logs
     bootstrap/cache
+    public/branding
   )
 
   local d
@@ -130,25 +131,25 @@ ensure_storage_permissions() {
 
   # Own only runtime-writable trees (not the whole site).
   # Prefer passwordless sudo — deploy user usually cannot chown to www-data.
-  if sudo -n chown -R "${web_user}:${web_user}" storage bootstrap/cache 2>/dev/null \
-    || chown -R "${web_user}:${web_user}" storage bootstrap/cache 2>/dev/null; then
-    log "Set owner ${web_user}:${web_user} on storage/ and bootstrap/cache/"
-  elif sudo -n chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null \
-    || chgrp -R "${web_user}" storage bootstrap/cache 2>/dev/null; then
+  if sudo -n chown -R "${web_user}:${web_user}" storage bootstrap/cache public/branding 2>/dev/null \
+    || chown -R "${web_user}:${web_user}" storage bootstrap/cache public/branding 2>/dev/null; then
+    log "Set owner ${web_user}:${web_user} on storage/, bootstrap/cache/, public/branding/"
+  elif sudo -n chgrp -R "${web_user}" storage bootstrap/cache public/branding 2>/dev/null \
+    || chgrp -R "${web_user}" storage bootstrap/cache public/branding 2>/dev/null; then
     log "chown failed; fell back to chgrp ${web_user}"
   else
-    log "WARNING: could not chown/chgrp storage as ${USER}."
+    log "WARNING: could not chown/chgrp storage/branding as ${USER}."
     log "Logo uploads need the PHP-FPM user. Run once:"
-    log "  sudo chown -R ${web_user}:${web_user} ${DEST}/storage ${DEST}/bootstrap/cache"
-    log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache"
+    log "  sudo chown -R ${web_user}:${web_user} ${DEST}/storage ${DEST}/bootstrap/cache ${DEST}/public/branding"
+    log "  sudo chmod -R ug+rwX ${DEST}/storage ${DEST}/bootstrap/cache ${DEST}/public/branding"
   fi
 
-  sudo -n chmod -R ug+rwX storage bootstrap/cache 2>/dev/null \
-    || chmod -R ug+rwX storage bootstrap/cache 2>/dev/null \
+  sudo -n chmod -R ug+rwX storage bootstrap/cache public/branding 2>/dev/null \
+    || chmod -R ug+rwX storage bootstrap/cache public/branding 2>/dev/null \
     || log "WARNING: chmod ug+rwX failed"
 
-  find storage bootstrap/cache -type d -exec chmod g+s {} \; 2>/dev/null || true
-  ls -ld storage storage/app/public storage/app/public/photos bootstrap/cache 2>/dev/null || true
+  find storage bootstrap/cache public/branding -type d -exec chmod g+s {} \; 2>/dev/null || true
+  ls -ld storage storage/app/public/photos bootstrap/cache public/branding 2>/dev/null || true
 }
 
 sync_application_code() {

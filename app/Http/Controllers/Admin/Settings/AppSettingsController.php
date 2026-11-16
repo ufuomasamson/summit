@@ -59,11 +59,11 @@ class AppSettingsController extends Controller
         return redirect()->back()->with('success', 'Settings Saved successfully');
     }
     /**
-     * Save an uploaded branding image into storage/app/public/photos.
-     * Uses a direct filesystem move so aaPanel/open_basedir issues surface clearly.
+     * Save branding image into public/branding (web-accessible).
+     * Nginx often blocks /storage/*, so logos must not rely on that URL.
      *
      * @param  \Illuminate\Http\UploadedFile  $file
-     * @param  string|null  $oldRelativePath  e.g. photos/old.png
+     * @param  string|null  $oldRelativePath
      * @return array{0: ?string, 1: ?string}  [relativePath, errorMessage]
      */
     protected function storePublicPhoto($file, $oldRelativePath = null): array
@@ -72,42 +72,48 @@ class AppSettingsController extends Controller
             return [null, 'Upload invalid: ' . $file->getErrorMessage()];
         }
 
-        $photosDir = storage_path('app/public/photos');
+        $brandingDir = public_path('branding');
 
-        if (!is_dir($photosDir) && !@mkdir($photosDir, 0775, true) && !is_dir($photosDir)) {
-            return [null, $this->storagePermissionHint($photosDir, 'Could not create photos directory')];
+        if (!is_dir($brandingDir) && !@mkdir($brandingDir, 0775, true) && !is_dir($brandingDir)) {
+            return [null, $this->storagePermissionHint($brandingDir, 'Could not create public/branding directory')];
         }
 
-        if (!is_writable($photosDir)) {
-            return [null, $this->storagePermissionHint($photosDir, 'photos directory is not writable')];
+        if (!is_writable($brandingDir)) {
+            return [null, $this->storagePermissionHint($brandingDir, 'public/branding is not writable')];
         }
 
-        // Remove previous file when present
+        // Remove previous branding file when present
         if (!empty($oldRelativePath)) {
-            $oldAbsolute = storage_path('app/public/' . ltrim(str_replace('\\', '/', $oldRelativePath), '/'));
-            if (is_file($oldAbsolute)) {
-                @unlink($oldAbsolute);
+            $old = ltrim(str_replace('\\', '/', $oldRelativePath), '/');
+            $candidates = [
+                public_path($old),
+                public_path('branding/' . basename($old)),
+                storage_path('app/public/' . $old),
+            ];
+            foreach ($candidates as $oldAbsolute) {
+                if (is_file($oldAbsolute)) {
+                    @unlink($oldAbsolute);
+                }
             }
         }
 
         $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'png');
-        $filename = uniqid('brand_', true) . '.' . $extension;
-        $relative = 'photos/' . $filename;
-        $absolute = $photosDir . DIRECTORY_SEPARATOR . $filename;
+        $filename = 'brand_' . str_replace('.', '', uniqid('', true)) . '.' . $extension;
+        $relative = 'branding/' . $filename;
+        $absolute = $brandingDir . DIRECTORY_SEPARATOR . $filename;
 
         try {
-            // Prefer native move — more reliable than Flysystem on some panels
-            $file->move($photosDir, $filename);
+            $file->move($brandingDir, $filename);
         } catch (\Throwable $e) {
             \Log::error('Brand image move failed: ' . $e->getMessage(), [
                 'php_user' => $this->currentPhpUser(),
-                'photos_dir' => $photosDir,
+                'branding_dir' => $brandingDir,
             ]);
-            return [null, $this->storagePermissionHint($photosDir, 'move failed: ' . $e->getMessage())];
+            return [null, $this->storagePermissionHint($brandingDir, 'move failed: ' . $e->getMessage())];
         }
 
         if (!is_file($absolute)) {
-            return [null, $this->storagePermissionHint($photosDir, 'file missing after move')];
+            return [null, $this->storagePermissionHint($brandingDir, 'file missing after move')];
         }
 
         @chmod($absolute, 0664);
@@ -127,17 +133,18 @@ class AppSettingsController extends Controller
         return get_current_user() ?: (string) getmyuid();
     }
 
-    protected function storagePermissionHint(string $photosDir, string $reason): string
+    protected function storagePermissionHint(string $dir, string $reason): string
     {
         $phpUser = $this->currentPhpUser();
         $siteRoot = base_path();
 
         return "Could not save image ({$reason}). "
-            . "PHP runs as [{$phpUser}]; target [{$photosDir}]. "
+            . "PHP runs as [{$phpUser}]; target [{$dir}]. "
             . "On the VPS run exactly: "
             . "cd {$siteRoot} && "
-            . "sudo chown -R {$phpUser}:{$phpUser} storage bootstrap/cache && "
-            . "sudo chmod -R ug+rwX storage bootstrap/cache";
+            . "sudo mkdir -p public/branding && "
+            . "sudo chown -R {$phpUser}:{$phpUser} public/branding storage bootstrap/cache && "
+            . "sudo chmod -R ug+rwX public/branding storage bootstrap/cache";
     }
 
     // update wensite information

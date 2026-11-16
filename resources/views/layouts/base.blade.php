@@ -7,7 +7,7 @@
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Mobile Banking, Credit Cards, Mortgages, Auto Loan">
-    <meta property="og:image" content="{{ asset('storage/app/public/' . $settings->favicon) }}">
+    <meta property="og:image" content="{{ branding_url($settings->favicon) }}">
 
     <!-- Links of CSS files -->
     <link rel="stylesheet" href="temp/custom/assets/css/bootstrap.min.css">
@@ -30,7 +30,7 @@
 
     <title>{{ $settings->site_name }}</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('storage/app/public/' . $settings->favicon) }}">
+    <link rel="icon" type="image/png" href="{{ branding_url($settings->favicon) }}">
     
     @if($settings->pwa_enabled ?? true)
     <!-- PWA Meta Tags -->
@@ -45,10 +45,10 @@
     <link rel="manifest" href="{{ route('manifest') }}">
     
     <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('storage/app/public/' . $settings->logo) }}">
-    <link rel="apple-touch-icon" sizes="167x167" href="{{ asset('storage/app/public/' . $settings->logo) }}">
+    <link rel="apple-touch-icon" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ branding_url($settings->logo) }}">
+    <link rel="apple-touch-icon" sizes="167x167" href="{{ branding_url($settings->logo) }}">
     @endif
     
     <style>
@@ -266,7 +266,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <a href="/" class="logo-link">
-                <img src="{{ asset('storage/app/public/' . $settings->logo) }}" alt="{{ $settings->site_name }}" class="logo-img">
+                <img src="{{ branding_url($settings->logo) }}" alt="{{ $settings->site_name }}" class="logo-img">
             </a>
             
             <button class="mobile-menu-toggle" id="mobileMenuToggle">
@@ -446,7 +446,7 @@
         <div class="row" style="margin-bottom: 3rem;">
             <div class="col-lg-4 col-md-6 mb-4">
                 <div style="margin-bottom: 1.5rem;">
-                    <img src="{{ asset('storage/app/public/' . $settings->logo) }}" alt="{{ $settings->site_name }}" style="height: 50px; width: auto; filter: brightness(0) invert(1);">
+                    <img src="{{ branding_url($settings->logo) }}" alt="{{ $settings->site_name }}" style="height: 50px; width: auto; filter: brightness(0) invert(1);">
                 </div>
                 <p style="font-family: 'DM Sans', sans-serif; color: rgba(255, 255, 255, 0.7); line-height: 1.8; margin-bottom: 1.5rem; font-size: 0.95rem;">{{ $settings->site_name }} is a bank for premier business, offering financial services and competitive products to Large Corporates and SMEs, International Clients, Institutional Investors, Provident and Pension Funds, Equity Funds as well as High Net Worth Individuals.</p>
             </div>
@@ -555,7 +555,7 @@
         installBanner.innerHTML = `
             <div style="position: fixed; bottom: 20px; right: 20px; max-width: 350px; background: linear-gradient(135deg, #2d8659 0%, #1e5a3d 100%); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 9999; animation: slideUp 0.5s ease;">
                 <div style="display: flex; align-items: start; gap: 15px;">
-                    <img src="{{ asset('storage/app/public/' . $settings->logo) }}" alt="App Icon" style="width: 48px; height: 48px; border-radius: 12px;">
+                    <img src="{{ branding_url($settings->logo) }}" alt="App Icon" style="width: 48px; height: 48px; border-radius: 12px;">
                     <div style="flex: 1;">
                         <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">Install {{ $settings->pwa_short_name ?? $settings->site_name }}</h3>
                         <p style="margin: 0 0 12px 0; font-size: 13px; opacity: 0.9; line-height: 1.4;">Get quick access from your home screen. Works offline!</p>

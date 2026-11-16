@@ -34,7 +34,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     @if($settings->logo ?? false)
-                        <img src="{{ asset('storage/app/public/' . $settings->logo) }}" 
+                        <img src="{{ branding_url($settings->logo) }}" 
                              alt="{{ $settings->site_name ?? 'Bank' }}" 
                              class="h-10 w-auto mb-1 print:h-10"
                              style="filter: brightness(0) invert(1);">

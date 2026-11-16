@@ -11,7 +11,7 @@
             <!-- Logo -->
             <div class="mb-8">
                 <a href="{{ route('home') }}" class="inline-block">
-                    <img src="{{ asset('storage/app/public/' . $settings->logo) }}" 
+                    <img src="{{ branding_url($settings->logo) }}" 
                          alt="{{ $settings->site_name }}" 
                          class="h-12 w-auto mb-6">
                 </a>
@@ -61,7 +61,7 @@
             <!-- Mobile Logo -->
             <div class="lg:hidden text-center mb-8">
                 <a href="{{ route('home') }}" class="inline-block">
-                    <img src="{{ asset('storage/app/public/' . $settings->logo) }}" 
+                    <img src="{{ branding_url($settings->logo) }}" 
                          alt="{{ $settings->site_name }}" 
                          class="h-10 w-auto mx-auto">
                 </a>
